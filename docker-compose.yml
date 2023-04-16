@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  dev-db:
+    image: postgres
+    hostname: psql
+    container_name: taskmanagement-db
+    volumes:
+      - data:/var/lib/postgressql/data
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_DB: taskmanagement
+      POSTGRES_USER: arminrazaghnejad
+      POSTGRES_PASSWORD: 123
+
+  service-task:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - dev-db
+    # command: -c yarn:start:dev
+          
+volumes:
+  data: 
