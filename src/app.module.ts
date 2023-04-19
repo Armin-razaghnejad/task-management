@@ -5,6 +5,7 @@ import { DatabaseModule } from 'libs/db/src/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { TasksModule } from './tasks/tasks.module';
 import * as Joi from '@hapi/joi';
 
 @Module({
@@ -21,6 +22,7 @@ import * as Joi from '@hapi/joi';
     }),
     UserModule,
     AuthModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

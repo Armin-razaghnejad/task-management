@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { SignupDto } from './dto/auth.dto';
+import { SigninDto, SignupDto } from './dto/auth.dto';
 import * as argon from 'argon2';
 import { Users } from 'libs/db/src/entities/users.entity';
 import { Repository } from 'typeorm';
@@ -23,13 +27,23 @@ export class AuthService {
     });
     try {
       await this.user.save(newuser);
-      return newuser;
+      return await this.signToken(newuser.id, newuser.email);
     } catch (error) {
-      return error;
+      if (error.code && error.code == '23505') {
+        throw new ConflictException();
+      } else {
+        throw error;
+      }
     }
   }
 
-  // async signin() {}
+  async signin(dto: SigninDto) {
+    const user = await this.user.findOneBy({ email: dto.email });
+    if (!user) return new ForbiddenException('Credential incorrect');
+    const pwMatch = await argon.verify(user.password, dto.password);
+    if (!pwMatch) throw new ForbiddenException('Credential incorrect');
+    return this.signToken(user.id, user.email);
+  }
 
   async signToken(
     userId: number,

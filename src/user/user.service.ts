@@ -5,18 +5,13 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(Users) private users: Repository<Users>) {}
-  async adduser() {
-    const newuser = this.users.create({
-      email: 'test@email',
-      password: '123',
-      username: 'armin razagh',
+  constructor(@InjectRepository(Users) private user: Repository<Users>) {}
+  async findAll() {
+    return this.user.find({
+      select: {
+        username: true,
+        id: true,
+      },
     });
-    try {
-      await this.users.save(newuser);
-      return newuser;
-    } catch (error) {
-      return error;
-    }
   }
 }
