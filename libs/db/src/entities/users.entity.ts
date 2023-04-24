@@ -20,18 +20,4 @@ export class Users {
 
   @Column()
   password: string;
-
-  @ManyToMany(() => Tasks, (task) => task.users)
-  @JoinTable({
-    name: 'user_tasks',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'task',
-      referencedColumnName: 'id',
-    },
-  })
-  tasks?: Tasks[];
 }

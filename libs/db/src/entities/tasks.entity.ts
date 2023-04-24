@@ -25,10 +25,11 @@ export class Tasks {
   @Column({ enum: TaskStatusEnum, default: TaskStatusEnum.open })
   status: TaskStatusEnum;
 
-  @ManyToMany(() => Users, (user) => user.tasks)
-  users?: number[];
+  @ManyToMany(() => Users)
+  @JoinTable()
+  users?: Users[];
 
-  @Column({ nullable: true, enum: TaskPriorityEnum })
+  @Column({ nullable: true, type: 'int8' })
   priority: TaskPriorityEnum;
 
   @Column({ default: false })

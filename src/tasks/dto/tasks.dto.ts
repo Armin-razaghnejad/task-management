@@ -35,5 +35,5 @@ export class TaskDto {
 }
 
 export interface TaskQueryInterface {
-  assigned: number[];
+  assigned: string;
 }

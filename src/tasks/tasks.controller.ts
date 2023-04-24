@@ -10,7 +10,11 @@ export class TasksController {
 
   @Get()
   findAll(@Query() query: TaskQueryInterface) {
-    return this.service.findAll(query);
+    let param: string[];
+    if (query?.assigned) {
+      param = query.assigned.split(',');
+    }
+    return this.service.findAll(param);
   }
 
   @Post()

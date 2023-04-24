@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tasks } from 'libs/db/src/entities/tasks.entity';
-import { Repository, getRepository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 import { TaskDto, TaskQueryInterface } from './dto';
 import { Users } from 'libs/db/src/entities/users.entity';
 
@@ -10,29 +10,38 @@ export class TasksService {
   constructor(
     @InjectRepository(Tasks) private tasks: Repository<Tasks>,
     @InjectRepository(Users) private users: Repository<Users>,
-  ) {
-    this.findAll({ assigned: [2] }).then((res) => console.log(res));
-  }
+  ) {}
 
-  async findAll(query?: TaskQueryInterface) {
-    return this.tasks.find();
+  async findAll(query?: string[]) {
+    let queryBuilder: FindOneOptions<Tasks>;
+    if (query)
+      queryBuilder = {
+        where: {
+          users: {
+            id: In(query),
+          },
+        },
+      };
+    return this.tasks.findAndCount({
+      relations: {
+        users: true,
+      },
+      ...queryBuilder,
+    });
   }
 
   async insert(dto: TaskDto) {
-    const userIds: Users[] = [];
-    if (dto.userIds?.length) {
-      for (const id of dto.userIds) {
-        const user = await this.users.findOne({
-          where: {
-            id,
-          },
-        });
-        if (user) userIds.push(user);
-      }
-    }
+    let users: Users[] = [];
+    if (dto.userIds?.length)
+      users = await this.users.find({
+        where: {
+          id: In(dto.userIds),
+        },
+      });
+
     const newtask = this.tasks.create({
       ...dto,
-      userIds: dto.userIds,
+      users: users,
     });
     try {
       await this.tasks.save(newtask);
